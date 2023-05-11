@@ -1,8 +1,9 @@
 ## flow_cytometry_bcbb_rtb_collab
 
 ### Aim
-Generate a container, that can perform operations such as Quality Control on `fcs` files.
-Once created, this container can be provided to third parties to do analysis.
+Allow users to convenient access to algorithms that can perform operations such as Quality Control on `fcs` files.
+Below discusses creating a Docker container which containes the pipeline. Running local containers allows users to avoid uploading and downloading their work.
+
 
 ### Usage
 
@@ -45,19 +46,27 @@ If we would like to see what these warnings are the QC_script_flowai.R file can 
 `options(warn=1)`
 added to the top of the R file.
 
-This script generates a directory called: `RTB_flowAI`, into which it places outputs.
-This might look like:
+This script generates a directory called: `RTB_flowAI`, into which it places outputs. Note that this is inside the container, and will vanish upon the container ending.
 
-`ls  RTB_flowAI/
+This output dir might look like:
+
+```
+ls  RTB_flowAI/
 _QCmini.txt  test_QC.fcs  test_QC.html
-`
+```
 
-What might be a nice starting point would be if we could define input and output directories, allowing something like
-`docker run -it --rm  --name devtest   -v $(pwd)/RTB/:/usr/local/src/myscripts/RTB/ -v $(pwd)/demo_outputs/:/usr/local/src/myscripts/demo_outputs flow_cyt_pipeline Rscript QC_script_flowai.R input_dir RTB output_dir demo_outputs`
+One starting point would be if we could define `input` and `output` directories, allowing something like
+```
+docker run -it --rm  --name devtest \
+-v $(pwd)/RTB/:/usr/local/src/myscripts/inputs \
+-v $(pwd)/demo_outputs/:/usr/local/src/myscripts/outputs \
+flow_cyt_pipeline \
+Rscript QC_script_flowai.R input inputs output outputs
+```
 
 And this will run the pipeline, and drop the outputs into `demo_outputs`.
 
-The aobve would require the script to accept arguments such as an input_dir, and an output_dir.
+The aobve would require the script to accept arguments such as an `input`, and `output`.
 Another feature that might be useful would be an argument defining which type of QC analysis to be performed (eg FlowAI). https://bioconductor.org/packages/3.16/bioc/html/flowAI.html
 
 Note, currently only FlowAI is available within the container.

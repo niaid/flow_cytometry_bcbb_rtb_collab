@@ -60,6 +60,11 @@ The aobve would require the script to accept arguments such as an `input`, and `
 Another feature that might be useful would be an argument defining which type of QC analysis to be performed eg [FlowAI](https://bioconductor.org/packages/3.16/bioc/html/flowAI.html).
 
 
+#### Dockerhub
+
+See: https://hub.docker.com/repository/docker/philipmac/flow_ai/general
+
+
 #### About the Dockerfile
 
 We're using a base image from R, specifically `r-base:4.2.2`

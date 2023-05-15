@@ -7,33 +7,13 @@ Below discusses creating a Docker container which contains the pipeline. Running
 
 ### Usage
 
-#### About the Dockerfile
-
-We're using a base image from R, specifically `r-base:4.2.2`
-from [here](https://hub.docker.com/layers/library/r-base/4.2.2/images/sha256-94ba89c4503af7c69dca11e855c24f30af8e21c43399d664a68ef8ae05a9f5a0?context=explore).
-
-`pandoc` is required by the pipeline, and we install this on top of base.
-
-Root is set as `/usr/local/src/myscripts`, and we copy whatever exists in this repo there.
-
-We use `renv.lock` to define our R environment, and this env is built with the command:
-
-`Rscript -e env::restore()`
-
-
-
-#### To build:
-
-`docker build --progress=plain . -t flow_cyt_pipeline`
-
-#### To Use:
-A directory needs to exist called `RTB` into which fcs files are placed.
+Currently a directory needs to exist on your filesystem called `RTB` into which input fcs files are placed.
 
 To look at the R code you can run:
 ```
 docker run -it --rm \
 -v $(pwd)/RTB/:/usr/local/src/myscripts/RTB/ \
-flow_cyt_pipeline bash
+philipmac/flow_ai bash
 ```
 
 This will drop you into an R environment, within which you can run the script.
@@ -65,18 +45,38 @@ ls  RTB_flowAI/
 _QCmini.txt  test_QC.fcs  test_QC.html
 ```
 
-One starting point would be if we could define `input` and `output` directories, allowing something like
+A more flexible solution would be if we could create an R script that would allow us to define `input` and `output` directories, enabling something like
 ```
 docker run -it --rm  --name devtest \
 -v $(pwd)/RTB/:/usr/local/src/myscripts/inputs \
 -v $(pwd)/demo_outputs/:/usr/local/src/myscripts/outputs \
-flow_cyt_pipeline \
+philipmac/flow_ai \
 Rscript QC_script_flowai.R input inputs output outputs
 ```
 
-And this will run the pipeline, and drop the outputs into `demo_outputs`.
+This would run the pipeline, and place outputs into `outputs`.
 
 The aobve would require the script to accept arguments such as an `input`, and `output`.
 Another feature that might be useful would be an argument defining which type of QC analysis to be performed eg [FlowAI](https://bioconductor.org/packages/3.16/bioc/html/flowAI.html).
+
+
+#### About the Dockerfile
+
+We're using a base image from R, specifically `r-base:4.2.2`
+from [here](https://hub.docker.com/layers/library/r-base/4.2.2/images/sha256-94ba89c4503af7c69dca11e855c24f30af8e21c43399d664a68ef8ae05a9f5a0?context=explore).
+
+`pandoc` is required by the pipeline, and we install this on top of base.
+
+Root is set as `/usr/local/src/myscripts`, and we copy whatever exists in this repo there.
+
+We use `renv.lock` to define our R environment, and this env is built with the command:
+
+`Rscript -e env::restore()`
+
+
+
+#### To build:
+
+`docker build --progress=plain . -t flow_ai`
 
 Note, currently only FlowAI is available within the container.
